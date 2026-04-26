@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>大学生职业规划倾向调查</title>
+<style>
+:root {
+  --primary: #1a56db;
+  --primary-light: #eef2ff;
+  --primary-hover: #1648c0;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --border: #e2e8f0;
+  --success: #10b981;
+  --danger: #ef4444;
+  --radius: 12px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;padding-bottom:60px}
+.container{max-width:640px;margin:0 auto;padding:16px}
+.header{background:linear-gradient(135deg,var(--primary),#3b82f6);color:#fff;padding:28px 20px;border-radius:0 0 var(--radius) var(--radius);margin:-16px -16px 24px;text-align:center}
+.header h1{font-size:1.35rem;font-weight:700;margin-bottom:4px;letter-spacing:.5px}
+.header p{font-size:.85rem;opacity:.85}
+.progress-wrap{background:var(--card);border-radius:var(--radius);padding:20px;margin-bottom:20px;box-shadow:var(--shadow)}
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),#3b82f6);border-radius:3px;transition:width .4s ease;width:0}
+.progress-label{font-size:.8rem;color:var(--text-secondary);text-align:center}
+.step{display:none}
+.step.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.step-title{font-size:1.1rem;font-weight:700;margin-bottom:4px}
+.step-desc{font-size:.85rem;color:var(--text-secondary);margin-bottom:20px}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.form-group{margin-bottom:18px}
+.form-group:last-child{margin-bottom:0}
+label{display:block;font-size:.92rem;font-weight:600;margin-bottom:6px}
+label .required{color:var(--danger);margin-left:2px}
+label .note{font-weight:400;color:var(--text-secondary);font-size:.82rem}
+input[type="text"],textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:.92rem;font-family:inherit;transition:border-color .2s;outline:none;background:#fff}
+input[type="text"]:focus,textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,86,219,.1)}
+textarea{resize:vertical;min-height:80px}
+.options{display:flex;flex-direction:column;gap:8px}
+.option{position:relative}
+.option label{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all .2s;font-weight:400;font-size:.9rem;line-height:1.5;margin:0}
+.option input{position:absolute;opacity:0;width:0;height:0}
+.option input:checked+label{border-color:var(--primary);background:var(--primary-light)}
+.option label:hover{border-color:#93c5fd}
+.option .radio-dot,.option .check-box{flex-shrink:0;width:20px;height:20px;border:2px solid #cbd5e1;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .2s}
+.option .check-box{border-radius:4px}
+.option input:checked+label .radio-dot{border-color:var(--primary)}
+.option input:checked+label .radio-dot::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--primary)}
+.option input:checked+label .check-box{border-color:var(--primary);background:var(--primary)}
+.option input:checked+label .check-box::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.btn-group{display:flex;gap:12px;margin-top:24px}
+.btn{flex:1;padding:12px 24px;border:none;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-secondary{background:var(--border);color:var(--text)}
+.btn-secondary:hover{background:#d1d9e6}
+.btn-success{background:var(--success);color:#fff}
+.welcome-icon{text-align:center;margin-bottom:20px;font-size:3rem}
+.welcome-features{display:flex;flex-direction:column;gap:10px;margin:20px 0}
+.welcome-features .item{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--text-secondary)}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 24px;border-radius:8px;font-size:.85rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.text-center{text-align:center}
+.mt-12{margin-top:12px}
+.error-msg{color:var(--danger);font-size:.82rem;margin-top:4px;display:none}
+.error-msg.show{display:block}
+input.error{border-color:var(--danger)!important}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-radius:50%;border-top-color:#fff;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:480px){
+  .container{padding:12px}
+  .header{padding:20px 16px}
+  .header h1{font-size:1.15rem}
+  .card{padding:16px}
+  .option label{padding:10px 12px;font-size:.85rem}
+  .btn{font-size:.88rem;padding:11px 16px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 大学生职业规划倾向调查</h1>
+  <p>本问卷旨在了解同学们对毕业去向的真实想法，<br>以便学校提供更有针对性的指导服务</p>
+</div>
+
+<div class="container">
+
+<div class="progress-wrap" id="progressWrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">第 0 / 6 步</div>
+</div>
+
+<!-- Welcome -->
+<div class="step active" id="step-welcome">
+  <div class="card">
+    <div class="welcome-icon">🎓</div>
+    <h2 class="step-title text-center">同学你好！</h2>
+    <p class="step-desc text-center">这是一份关于大学生职业规划倾向的匿名调查，<br>大约需要 <strong>3-5 分钟</strong>完成。</p>
+    <div class="welcome-features">
+      <div class="item"><span class="icon">🔒</span> 匿名填写，数据仅用于统计分析</div>
+      <div class="item"><span class="icon">📱</span> 手机友好，随时可填</div>
+      <div class="item"><span class="icon">🔄</span> 支持中途退出，进度自动保存</div>
+    </div>
+    <button class="btn btn-primary" onclick="survey.start()" style="margin-top:12px">开始填写 →</button>
+  </div>
+</div>
+
+<!-- Basic Info -->
+<div class="step" id="step-basic">
+  <div class="card">
+    <div class="step-title">基本信息</div>
+    <div class="step-desc">请先告诉我们你的基本情况</div>
+    <div class="form-group">
+      <label>你的专业是？<span class="required">*</span></label>
+      <input type="text" id="q1" placeholder="请输入你的专业名称" maxlength="50">
+      <div class="error-msg" id="err-q1">请填写你的专业</div>
+    </div>
+    <div class="form-group">
+      <label>你的年级是？<span class="required">*</span></label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q2" id="q2a" value="大一"><label for="q2a"><span class="radio-dot"></span> 大一</label></div>
+        <div class="option"><input type="radio" name="q2" id="q2b" value="大二上学期"><label for="q2b"><span class="radio-dot"></span> 大二上学期</label></div>
+      </div>
+      <div class="error-msg" id="err-q2">请选择你的年级</div>
+    </div>
+    <div class="form-group">
+      <label>你的性别是？</label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q3" id="q3a" value="男"><label for="q3a"><span class="radio-dot"></span> 男</label></div>
+        <div class="option"><input type="radio" name="q3" id="q3b" value="女"><label for="q3b"><span class="radio-dot"></span> 女</label></div>
+        <div class="option"><input type="radio" name="q3" id="q3c" value="不愿透露"><label for="q3c"><span class="radio-dot"></span> 不愿透露</label></div>
+      </div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="survey.goBack()">上一步</button>
+      <button class="btn btn-primary" onclick="survey.next()">下一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- Core -->
+<div class="step" id="step-core">
+  <div class="card">
+    <div class="step-title">毕业去向意向</div>
+    <div class="step-desc">你目前对本科毕业后发展的初步倾向是？<span class="required">*</span></div>
+    <div class="form-group">
+      <div class="options">
+        <div class="option"><input type="radio" name="q4" id="q4a" value="就业"><label for="q4a"><span class="radio-dot"></span> <strong>本科毕业后直接就业</strong><br><span style="font-size:.82rem;color:var(--text-secondary)">进入职场，开始工作</span></label></div>
+        <div class="option"><input type="radio" name="q4" id="q4b" value="深造"><label for="q4b"><span class="radio-dot"></span> <strong>继续深造（考研/保研）</strong><br><span style="font-size:.82rem;color:var(--text-secondary)">攻读硕士或博士学位</span></label></div>
+        <div class="option"><input type="radio" name="q4" id="q4c" value="未确定"><label for="q4c"><span class="radio-dot"></span> <strong>尚未确定</strong><br><span style="font-size:.82rem;color:var(--text-secondary)">还在考虑中</span></label></div>
+        <div class="option"><input type="radio" name="q4" id="q4d" value="其他"><label for="q4d"><span class="radio-dot"></span> <strong>其他（创业、出国等）</strong><br><span style="font-size:.82rem;color:var(--text-secondary)">有其他规划</span></label></div>
+      </div>
+      <div class="error-msg" id="err-q4">请选择一个选项</div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="survey.goBack()">上一步</button>
+      <button class="btn btn-primary" onclick="survey.next()">下一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- Employment -->
+<div class="step" id="step-employment">
+  <div class="card">
+    <div class="step-title">就业方向规划</div>
+    <div class="step-desc">关于直接就业，我们想了解更多</div>
+    <div class="form-group">
+      <label>你倾向于从事的工作领域与你专业的关联度是？<span class="required">*</span></label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q5" id="q5a" value="专业对口"><label for="q5a"><span class="radio-dot"></span> 专业对口，从事本专业相关工作</label></div>
+        <div class="option"><input type="radio" name="q5" id="q5b" value="专业相关"><label for="q5b"><span class="radio-dot"></span> 专业相关但不完全对口</label></div>
+        <div class="option"><input type="radio" name="q5" id="q5c" value="跨专业"><label for="q5c"><span class="radio-dot"></span> 跨专业就业，尝试全新领域</label></div>
+      </div>
+      <div class="error-msg" id="err-q5">请选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你倾向的就业单位类型是？<span class="required">*</span></label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q6" id="q6a" value="国企央企"><label for="q6a"><span class="radio-dot"></span> 国企/央企</label></div>
+        <div class="option"><input type="radio" name="q6" id="q6b" value="民营企业"><label for="q6b"><span class="radio-dot"></span> 民营企业</label></div>
+        <div class="option"><input type="radio" name="q6" id="q6c" value="外企"><label for="q6c"><span class="radio-dot"></span> 外企/跨国公司</label></div>
+        <div class="option"><input type="radio" name="q6" id="q6d" value="政府机关"><label for="q6d"><span class="radio-dot"></span> 政府机关/事业单位</label></div>
+        <div class="option"><input type="radio" name="q6" id="q6e" value="创业"><label for="q6e"><span class="radio-dot"></span> 自主创业/自由职业</label></div>
+        <div class="option"><input type="radio" name="q6" id="q6f" value="无明确偏好"><label for="q6f"><span class="radio-dot"></span> 目前没有明确偏好</label></div>
+      </div>
+      <div class="error-msg" id="err-q6">请选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你期望的起薪范围是？<span class="required">*</span></label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q7" id="q7a" value="5000以下"><label for="q7a"><span class="radio-dot"></span> 5000 元以下/月</label></div>
+        <div class="option"><input type="radio" name="q7" id="q7b" value="5000-8000"><label for="q7b"><span class="radio-dot"></span> 5000-8000 元/月</label></div>
+        <div class="option"><input type="radio" name="q7" id="q7c" value="8001-12000"><label for="q7c"><span class="radio-dot"></span> 8001-12000 元/月</label></div>
+        <div class="option"><input type="radio" name="q7" id="q7d" value="12000以上"><label for="q7d"><span class="radio-dot"></span> 12000 元以上/月</label></div>
+        <div class="option"><input type="radio" name="q7" id="q7e" value="没概念"><label for="q7e"><span class="radio-dot"></span> 对薪资没有明确概念</label></div>
+      </div>
+      <div class="error-msg" id="err-q7">请选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你为直接就业做了哪些准备？<span class="required">*</span><span class="note">（可多选）</span></label>
+      <div class="options">
+        <div class="option"><input type="checkbox" name="q8" id="q8a" value="实习"><label for="q8a"><span class="check-box"></span> 参加实习/兼职积累经验</label></div>
+        <div class="option"><input type="checkbox" name="q8" id="q8b" value="证书"><label for="q8b"><span class="check-box"></span> 考取职业资格证书</label></div>
+        <div class="option"><input type="checkbox" name="q8" id="q8c" value="培训"><label for="q8c"><span class="check-box"></span> 参加职业规划讲座或培训</label></div>
+        <div class="option"><input type="checkbox" name="q8" id="q8d" value="技能"><label for="q8d"><span class="check-box"></span> 学习额外的职业技能</label></div>
+        <div class="option"><input type="checkbox" name="q8" id="q8e" value="招聘"><label for="q8e"><span class="check-box"></span> 参加校园招聘会/了解就业信息</label></div>
+        <div class="option"><input type="checkbox" name="q8" id="q8f" value="没准备"><label for="q8f"><span class="check-box"></span> 还没有做具体准备</label></div>
+      </div>
+      <div class="error-msg" id="err-q8">请至少选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你选择直接就业的主要原因是什么？<span class="required">*</span><span class="note">（可多选）</span></label>
+      <div class="options">
+        <div class="option"><input type="checkbox" name="q9" id="q9a" value="经济独立"><label for="q9a"><span class="check-box"></span> 希望尽早经济独立</label></div>
+        <div class="option"><input type="checkbox" name="q9" id="q9b" value="不感兴趣"><label for="q9b"><span class="check-box"></span> 对学术研究不感兴趣</label></div>
+        <div class="option"><input type="checkbox" name="q9" id="q9c" value="家庭因素"><label for="q9c"><span class="check-box"></span> 家庭因素（需要尽早工作）</label></div>
+        <div class="option"><input type="checkbox" name="q9" id="q9d" value="实践更重要"><label for="q9d"><span class="check-box"></span> 认为实践比学历更重要</label></div>
+        <div class="option"><input type="checkbox" name="q9" id="q9e" value="考研太难"><label for="q9e"><span class="check-box"></span> 考研竞争太大，不想冒险</label></div>
+        <div class="option"><input type="checkbox" name="q9" id="q9f" value="已有机会"><label for="q9f"><span class="check-box"></span> 已有明确的职业机会</label></div>
+        <div class="option"><input type="checkbox" name="q9" id="q9g" value="其他"><label for="q9g"><span class="check-box"></span> 其他原因</label></div>
+      </div>
+      <div class="error-msg" id="err-q9">请至少选择一个选项</div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="survey.goBack()">上一步</button>
+      <button class="btn btn-primary" onclick="survey.next()">下一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- Further Study -->
+<div class="step" id="step-further-study">
+  <div class="card">
+    <div class="step-title">深造方向规划</div>
+    <div class="step-desc">关于考研/保研，我们想了解更多</div>
+    <div class="form-group">
+      <label>你倾向的深造类型是？<span class="required">*</span></label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q10" id="q10a" value="学硕"><label for="q10a"><span class="radio-dot"></span> <strong>学术型硕士（学硕）</strong><br><span style="font-size:.82rem;color:var(--text-secondary)">侧重学术研究，未来可能读博</span></label></div>
+        <div class="option"><input type="radio" name="q10" id="q10b" value="专硕"><label for="q10b"><span class="radio-dot"></span> <strong>专业型硕士（专硕）</strong><br><span style="font-size:.82rem;color:var(--text-secondary)">侧重实践应用，以就业为导向</span></label></div>
+        <div class="option"><input type="radio" name="q10" id="q10c" value="直博"><label for="q10c"><span class="radio-dot"></span> <strong>直博/硕博连读</strong><br><span style="font-size:.82rem;color:var(--text-secondary)">以学术研究为长期目标</span></label></div>
+        <div class="option"><input type="radio" name="q10" id="q10d" value="未定"><label for="q10d"><span class="radio-dot"></span> <strong>还没想好学硕/专硕</strong></label></div>
+      </div>
+      <div class="error-msg" id="err-q10">请选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你计划报考的院校层次是？<span class="required">*</span></label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q11" id="q11a" value="本校"><label for="q11a"><span class="radio-dot"></span> 本校</label></div>
+        <div class="option"><input type="radio" name="q11" id="q11b" value="国内顶尖"><label for="q11b"><span class="radio-dot"></span> 国内顶尖高校（985/双一流）</label></div>
+        <div class="option"><input type="radio" name="q11" id="q11c" value="国内其他"><label for="q11c"><span class="radio-dot"></span> 国内其他高校</label></div>
+        <div class="option"><input type="radio" name="q11" id="q11d" value="国外"><label for="q11d"><span class="radio-dot"></span> 国外/境外院校</label></div>
+        <div class="option"><input type="radio" name="q11" id="q11e" value="未确定"><label for="q11e"><span class="radio-dot"></span> 还没确定目标院校</label></div>
+      </div>
+      <div class="error-msg" id="err-q11">请选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你计划跨专业考研吗？<span class="required">*</span></label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q12" id="q12a" value="跨考"><label for="q12a"><span class="radio-dot"></span> 是，计划跨考到其他专业</label></div>
+        <div class="option"><input type="radio" name="q12" id="q12b" value="本专业"><label for="q12b"><span class="radio-dot"></span> 否，继续本专业深造</label></div>
+        <div class="option"><input type="radio" name="q12" id="q12c" value="没决定"><label for="q12c"><span class="radio-dot"></span> 还没决定</label></div>
+      </div>
+      <div class="error-msg" id="err-q12">请选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你选择继续深造的主要原因是什么？<span class="required">*</span><span class="note">（可多选）</span></label>
+      <div class="options">
+        <div class="option"><input type="checkbox" name="q13" id="q13a" value="提升学历"><label for="q13a"><span class="check-box"></span> 提升学历，增强就业竞争力</label></div>
+        <div class="option"><input type="checkbox" name="q13" id="q13b" value="学术兴趣"><label for="q13b"><span class="check-box"></span> 对学术研究有浓厚兴趣</label></div>
+        <div class="option"><input type="checkbox" name="q13" id="q13c" value="暂缓就业"><label for="q13c"><span class="check-box"></span> 暂缓就业，争取更多准备时间</label></div>
+        <div class="option"><input type="checkbox" name="q13" id="q13d" value="家人期望"><label for="q13d"><span class="check-box"></span> 家人期望/社会压力</label></div>
+        <div class="option"><input type="checkbox" name="q13" id="q13e" value="学历门槛"><label for="q13e"><span class="check-box"></span> 希望进入对学历有硬性要求的行业</label></div>
+        <div class="option"><input type="checkbox" name="q13" id="q13f" value="跟风"><label for="q13f"><span class="check-box"></span> 跟风/身边同学都在考</label></div>
+        <div class="option"><input type="checkbox" name="q13" id="q13g" value="其他"><label for="q13g"><span class="check-box"></span> 其他原因</label></div>
+      </div>
+      <div class="error-msg" id="err-q13">请至少选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你为考研做了哪些准备？<span class="required">*</span><span class="note">（可多选）</span></label>
+      <div class="options">
+        <div class="option"><input type="checkbox" name="q14" id="q14a" value="复习公共课"><label for="q14a"><span class="check-box"></span> 已经开始复习公共课（英语、政治、数学）</label></div>
+        <div class="option"><input type="checkbox" name="q14" id="q14b" value="确定目标"><label for="q14b"><span class="check-box"></span> 已经确定目标院校和专业</label></div>
+        <div class="option"><input type="checkbox" name="q14" id="q14c" value="联系学长"><label for="q14c"><span class="check-box"></span> 联系了学长学姐或导师了解信息</label></div>
+        <div class="option"><input type="checkbox" name="q14" id="q14d" value="报班"><label for="q14d"><span class="check-box"></span> 报了辅导班/购买了备考资料</label></div>
+        <div class="option"><input type="checkbox" name="q14" id="q14e" value="科研项目"><label for="q14e"><span class="check-box"></span> 参加了科研项目/实验室工作</label></div>
+        <div class="option"><input type="checkbox" name="q14" id="q14f" value="没准备"><label for="q14f"><span class="check-box"></span> 还没有开始具体准备</label></div>
+      </div>
+      <div class="error-msg" id="err-q14">请至少选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>如果考研失败，你的备选方案是？<span class="required">*</span></label>
+      <div class="options">
+        <div class="option"><input type="radio" name="q15" id="q15a" value="二战"><label for="q15a"><span class="radio-dot"></span> 二战（再考一年）</label></div>
+        <div class="option"><input type="radio" name="q15" id="q15b" value="直接就业"><label for="q15b"><span class="radio-dot"></span> 直接就业</label></div>
+        <div class="option"><input type="radio" name="q15" id="q15c" value="先工作再考"><label for="q15c"><span class="radio-dot"></span> 先工作再考虑考研</label></div>
+        <div class="option"><input type="radio" name="q15" id="q15d" value="出国"><label for="q15d"><span class="radio-dot"></span> 出国留学</label></div>
+        <div class="option"><input type="radio" name="q15" id="q15e" value="没想过"><label for="q15e"><span class="radio-dot"></span> 还没想过这个问题</label></div>
+      </div>
+      <div class="error-msg" id="err-q15">请选择一个选项</div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="survey.goBack()">上一步</button>
+      <button class="btn btn-primary" onclick="survey.next()">下一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- Undecided -->
+<div class="step" id="step-undecided">
+  <div class="card">
+    <div class="step-title">未确定原因</div>
+    <div class="step-desc">没关系，很多同学都还在探索中</div>
+    <div class="form-group">
+      <label>你目前感到困惑的主要原因是什么？<span class="required">*</span><span class="note">（可多选）</span></label>
+      <div class="options">
+        <div class="option"><input type="checkbox" name="q16" id="q16a" value="不了解就业"><label for="q16a"><span class="check-box"></span> 对本专业的就业前景不了解</label></div>
+        <div class="option"><input type="checkbox" name="q16" id="q16b" value="不了解考研"><label for="q16b"><span class="check-box"></span> 对考研/科研道路不了解</label></div>
+        <div class="option"><input type="checkbox" name="q16" id="q16c" value="不清楚兴趣"><label for="q16c"><span class="check-box"></span> 不清楚自己的兴趣和优势</label></div>
+        <div class="option"><input type="checkbox" name="q16" id="q16d" value="家人分歧"><label for="q16d"><span class="check-box"></span> 家人意见与自己的想法不一致</label></div>
+        <div class="option"><input type="checkbox" name="q16" id="q16e" value="信息太多"><label for="q16e"><span class="check-box"></span> 信息太多，不知道如何选择</label></div>
+        <div class="option"><input type="checkbox" name="q16" id="q16f" value="其他"><label for="q16f"><span class="check-box"></span> 其他原因</label></div>
+      </div>
+      <div class="error-msg" id="err-q16">请至少选择一个选项</div>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="survey.goBack()">上一步</button>
+      <button class="btn btn-primary" onclick="survey.next()">下一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- Common -->
+<div class="step" id="step-common">
+  <div class="card">
+    <div class="step-title">综合信息</div>
+    <div class="step-desc">最后几个问题，帮助我们改进服务</div>
+    <div class="form-group">
+      <label>你认为学校在职业规划方面最需要提供什么支持？<span class="required">*</span><span class="note">（可多选）</span></label>
+      <div class="options">
+        <div class="option"><input type="checkbox" name="q17" id="q17a" value="课程讲座"><label for="q17a"><span class="check-box"></span> 职业生涯规划课程/讲座</label></div>
+        <div class="option"><input type="checkbox" name="q17" id="q17b" value="实习推荐"><label for="q17b"><span class="check-box"></span> 实习机会推荐</label></div>
+        <div class="option"><input type="checkbox" name="q17" id="q17c" value="考研辅导"><label for="q17c"><span class="check-box"></span> 考研辅导/经验分享</label></div>
+        <div class="option"><input type="checkbox" name="q17" id="q17d" value="职业咨询"><label for="q17d"><span class="check-box"></span> 一对一职业咨询</label></div>
+        <div class="option"><input type="checkbox" name="q17" id="q17e" value="招聘会"><label for="q17e"><span class="check-box"></span> 企业宣讲会/招聘会</label></div>
+        <div class="option"><input type="checkbox" name="q17" id="q17f" value="学长分享"><label for="q17f"><span class="check-box"></span> 学长学姐经验分享</label></div>
+        <div class="option"><input type="checkbox" name="q17" id="q17g" value="其他"><label for="q17g"><span class="check-box"></span> 其他支持</label></div>
+      </div>
+      <div class="error-msg" id="err-q17">请至少选择一个选项</div>
+    </div>
+    <div class="form-group">
+      <label>你对未来的职业发展还有什么想说的？<span class="note">（选填）</span></label>
+      <textarea id="q18" placeholder="分享你的想法、困惑或期望……" maxlength="500"></textarea>
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="survey.goBack()">上一步</button>
+      <button class="btn btn-primary" id="submitBtn" onclick="survey.submit()">提交问卷</button>
+    </div>
+  </div>
+</div>
+
+<!-- Complete -->
+<div class="step" id="step-complete">
+  <div class="card">
+    <div class="welcome-icon">✅</div>
+    <h2 class="step-title text-center">问卷提交成功！</h2>
+    <p class="step-desc text-center">感谢你的参与，你的回答将帮助我们更好地了解同学们的职业规划需求。</p>
+    <div class="summary-card" id="summaryCard">
+      <h3>📊 你的选择概要</h3>
+      <p id="summaryMajor">专业：—</p>
+      <p id="summaryGrade">年级：—</p>
+      <p id="summaryPath">毕业去向：—</p>
+    </div>
+    <div class="text-center mt-12">
+      <button class="btn btn-secondary" onclick="survey.reset()" style="width:100%">🔄 再填一份</button>
+    </div>
+    <p class="text-center" style="font-size:.85rem;color:var(--text-secondary);margin-top:16px">
+      📊 管理员请访问 <a href="/admin.html" style="color:var(--primary)">管理页面</a>
+    </p>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+class SurveyManager {
+  constructor() {
+    this.steps = [
+      'welcome', 'basic', 'core', 'employment',
+      'further-study', 'undecided', 'common', 'complete'
+    ];
+    this.currentIdx = 0;
+    this.answers = {};
+    this.init();
+  }
+
+  init() {
+    const saved = localStorage.getItem('survey_answers');
+    if (saved) {
+      try { this.answers = JSON.parse(saved); } catch(e) {}
+    }
+    const savedStep = localStorage.getItem('survey_step');
+    if (savedStep && this.answers.q4) {
+      this.currentIdx = this.getTargetSteps().indexOf(savedStep);
+      if (this.currentIdx < 0) this.currentIdx = 0;
+    }
+    this.showStep(this.steps[this.currentIdx]);
+  }
+
+  getTargetSteps() {
+    const base = ['welcome', 'basic', 'core'];
+    const branch = this.answers.q4 || '';
+    let mid = [];
+    if (branch === '就业') mid = ['employment'];
+    else if (branch === '深造') mid = ['further-study'];
+    else if (branch === '未确定') mid = ['undecided'];
+    const tail = ['common', 'complete'];
+    return [...base, ...mid, ...tail];
+  }
+
+  start() {
+    this.currentIdx = 1;
+    this.showStep('basic');
+  }
+
+  showStep(stepId) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById('step-' + stepId);
+    if (el) el.classList.add('active');
+
+    const seq = this.getTargetSteps();
+    const idx = seq.indexOf(stepId);
+    this.currentIdx = Math.max(0, idx);
+    const total = seq.length - 1;
+    const progressIdx = Math.min(idx, total);
+    const pct = total > 0 ? (progressIdx / total * 100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = `第 ${progressIdx} / ${total} 步`;
+
+    localStorage.setItem('survey_step', stepId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  collectCurrentStep() {
+    const stepId = this.steps[this.currentIdx];
+    switch (stepId) {
+      case 'basic':
+        this.answers.q1 = document.getElementById('q1').value.trim();
+        this.answers.q2 = document.querySelector('input[name="q2"]:checked')?.value || '';
+        this.answers.q3 = document.querySelector('input[name="q3"]:checked')?.value || '';
+        break;
+      case 'core':
+        this.answers.q4 = document.querySelector('input[name="q4"]:checked')?.value || '';
+        break;
+      case 'employment':
+        this.answers.q5 = document.querySelector('input[name="q5"]:checked')?.value || '';
+        this.answers.q6 = document.querySelector('input[name="q6"]:checked')?.value || '';
+        this.answers.q7 = document.querySelector('input[name="q7"]:checked')?.value || '';
+        this.answers.q8 = this.getCheckboxValues('q8');
+        this.answers.q9 = this.getCheckboxValues('q9');
+        break;
+      case 'further-study':
+        this.answers.q10 = document.querySelector('input[name="q10"]:checked')?.value || '';
+        this.answers.q11 = document.querySelector('input[name="q11"]:checked')?.value || '';
+        this.answers.q12 = document.querySelector('input[name="q12"]:checked')?.value || '';
+        this.answers.q13 = this.getCheckboxValues('q13');
+        this.answers.q14 = this.getCheckboxValues('q14');
+        this.answers.q15 = document.querySelector('input[name="q15"]:checked')?.value || '';
+        break;
+      case 'undecided':
+        this.answers.q16 = this.getCheckboxValues('q16');
+        break;
+      case 'common':
+        this.answers.q17 = this.getCheckboxValues('q17');
+        this.answers.q18 = document.getElementById('q18').value.trim();
+        break;
+    }
+    localStorage.setItem('survey_answers', JSON.stringify(this.answers));
+  }
+
+  restoreToStep(stepId) {
+    switch (stepId) {
+      case 'basic':
+        document.getElementById('q1').value = this.answers.q1 || '';
+        if (this.answers.q2) {
+          const el = document.getElementById('q2' + (this.answers.q2 === '大一' ? 'a' : 'b'));
+          if (el) el.checked = true;
+        }
+        if (this.answers.q3) {
+          const map = { '男': 'a', '女': 'b', '不愿透露': 'c' };
+          const el = document.getElementById('q3' + map[this.answers.q3]);
+          if (el) el.checked = true;
+        }
+        break;
+      case 'core':
+        if (this.answers.q4) {
+          const map = { '就业': 'a', '深造': 'b', '未确定': 'c', '其他': 'd' };
+          const el = document.getElementById('q4' + map[this.answers.q4]);
+          if (el) el.checked = true;
+        }
+        break;
+      case 'employment':
+        this.restoreRadio('q5', ['a','b','c']);
+        this.restoreRadio('q6', ['a','b','c','d','e','f']);
+        this.restoreRadio('q7', ['a','b','c','d','e']);
+        this.restoreCheckbox('q8', ['a','b','c','d','e','f']);
+        this.restoreCheckbox('q9', ['a','b','c','d','e','f','g']);
+        break;
+      case 'further-study':
+        this.restoreRadio('q10', ['a','b','c','d']);
+        this.restoreRadio('q11', ['a','b','c','d','e']);
+        this.restoreRadio('q12', ['a','b','c']);
+        this.restoreCheckbox('q13', ['a','b','c','d','e','f','g']);
+        this.restoreCheckbox('q14', ['a','b','c','d','e','f']);
+        this.restoreRadio('q15', ['a','b','c','d','e']);
+        break;
+      case 'undecided':
+        this.restoreCheckbox('q16', ['a','b','c','d','e','f']);
+        break;
+      case 'common':
+        this.restoreCheckbox('q17', ['a','b','c','d','e','f','g']);
+        document.getElementById('q18').value = this.answers.q18 || '';
+        break;
+    }
+  }
+
+  restoreRadio(name, suffixes) {
+    const val = this.answers[name];
+    if (!val) return;
+    for (const s of suffixes) {
+      const el = document.getElementById(name + s);
+      if (el && el.value === val) { el.checked = true; break; }
+    }
+  }
+
+  restoreCheckbox(name, suffixes) {
+    const vals = this.answers[name] || [];
+    for (const s of suffixes) {
+      const el = document.getElementById(name + s);
+      if (el && vals.includes(el.value)) el.checked = true;
+    }
+  }
+
+  getCheckboxValues(name) {
+    return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
+      .map(el => el.value);
+  }
+
+  validateStep(stepId) {
+    let valid = true;
+    document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('input.error').forEach(e => e.classList.remove('error'));
+
+    const showErr = (id) => {
+      const el = document.getElementById('err-' + id);
+      if (el) el.classList.add('show');
+      valid = false;
+    };
+
+    switch (stepId) {
+      case 'basic':
+        if (!this.answers.q1) { showErr('q1'); document.getElementById('q1').classList.add('error'); }
+        if (!this.answers.q2) showErr('q2');
+        break;
+      case 'core':
+        if (!this.answers.q4) showErr('q4');
+        break;
+      case 'employment':
+        if (!this.answers.q5) showErr('q5');
+        if (!this.answers.q6) showErr('q6');
+        if (!this.answers.q7) showErr('q7');
+        if (!this.answers.q8 || this.answers.q8.length === 0) showErr('q8');
+        if (!this.answers.q9 || this.answers.q9.length === 0) showErr('q9');
+        break;
+      case 'further-study':
+        if (!this.answers.q10) showErr('q10');
+        if (!this.answers.q11) showErr('q11');
+        if (!this.answers.q12) showErr('q12');
+        if (!this.answers.q13 || this.answers.q13.length === 0) showErr('q13');
+        if (!this.answers.q14 || this.answers.q14.length === 0) showErr('q14');
+        if (!this.answers.q15) showErr('q15');
+        break;
+      case 'undecided':
+        if (!this.answers.q16 || this.answers.q16.length === 0) showErr('q16');
+        break;
+      case 'common':
+        if (!this.answers.q17 || this.answers.q17.length === 0) showErr('q17');
+        break;
+    }
+    return valid;
+  }
+
+  next() {
+    const stepId = this.steps[this.currentIdx];
+    this.collectCurrentStep();
+    if (!this.validateStep(stepId)) return;
+    const seq = this.getTargetSteps();
+    const nextIdx = seq.indexOf(stepId) + 1;
+    if (nextIdx < seq.length) {
+      const nextStep = seq[nextIdx];
+      this.currentIdx = this.steps.indexOf(nextStep);
+      this.showStep(nextStep);
+      this.restoreToStep(nextStep);
+    }
+  }
+
+  goBack() {
+    const seq = this.getTargetSteps();
+    const stepId = this.steps[this.currentIdx];
+    const idx = seq.indexOf(stepId);
+    if (idx > 0) {
+      const prevStep = seq[idx - 1];
+      this.currentIdx = this.steps.indexOf(prevStep);
+      this.showStep(prevStep);
+      this.restoreToStep(prevStep);
+    }
+  }
+
+  submit() {
+    this.collectCurrentStep();
+    if (!this.validateStep('common')) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> 提交中...';
+
+    fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(this.answers)
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        this.showSummary();
+        localStorage.removeItem('survey_answers');
+        localStorage.removeItem('survey_step');
+        this.currentIdx = this.steps.indexOf('complete');
+        this.showStep('complete');
+        this.showToast('🎉 问卷提交成功！');
+      } else {
+        this.showToast('提交失败：' + (data.error || '请重试'));
+        btn.disabled = false;
+        btn.textContent = '提交问卷';
+      }
+    })
+    .catch(e => {
+      this.showToast('网络错误，请检查连接后重试');
+      btn.disabled = false;
+      btn.textContent = '提交问卷';
+    });
+  }
+
+  showSummary() {
+    const major = this.answers.q1 || '—';
+    const grade = this.answers.q2 || '—';
+    const pathMap = { '就业': '本科毕业后直接就业', '深造': '继续深造（考研/保研）', '未确定': '尚未确定', '其他': '其他（创业、出国等）' };
+    const path = pathMap[this.answers.q4] || this.answers.q4 || '—';
+    document.getElementById('summaryMajor').textContent = '专业：' + major;
+    document.getElementById('summaryGrade').textContent = '年级：' + grade;
+    document.getElementById('summaryPath').textContent = '毕业去向：' + path;
+  }
+
+  reset() {
+    this.answers = {};
+    this.currentIdx = 0;
+    localStorage.removeItem('survey_answers');
+    localStorage.removeItem('survey_step');
+    document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(el => el.checked = false);
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = '提交问卷';
+    this.showStep('welcome');
+  }
+
+  showToast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2500);
+  }
+}
+
+const survey = new SurveyManager();
+</script>
+
+</body>
+</html>
